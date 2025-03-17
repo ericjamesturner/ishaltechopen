@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haltech Hours Checker</title>
+</head>
+<body>
+    <h1>Haltech Locations Open Status</h1>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Location</th>
+                <th>Status</th>
+                <th>Next Open/Close</th>
+            </tr>
+        </thead>
+        <tbody id="results"></tbody>
+    </table>
+
+    <script>
+        function isOpenNow(openTime, closeTime, timeZone) {
+            const now = new Date();
+            const options = { timeZone, hour12: false, hour: '2-digit', minute: '2-digit' };
+            const formatter = new Intl.DateTimeFormat('en-US', options);
+            const localTime = formatter.format(now);
+
+            const [openHour, openMinute] = openTime.split(':').map(Number);
+            const [closeHour, closeMinute] = closeTime.split(':').map(Number);
+            const [currentHour, currentMinute] = localTime.split(':').map(Number);
+
+            const openMinutes = openHour * 60 + openMinute;
+            const closeMinutes = closeHour * 60 + closeMinute;
+            const currentMinutes = currentHour * 60 + currentMinute;
+
+            return {
+                isOpen: currentMinutes >= openMinutes && currentMinutes <= closeMinutes,
+                currentMinutes,
+                openMinutes,
+                closeMinutes
+            };
+        }
+
+        const locations = [
+            { name: "Haltech USA EAST", timeZone: "America/New_York", open: "08:00", close: "17:00" },
+            { name: "Haltech USA WEST", timeZone: "America/Los_Angeles", open: "08:00", close: "17:00" },
+            { name: "Haltech UK", timeZone: "Europe/London", open: "08:00", close: "17:00" },
+            { name: "Haltech NZ", timeZone: "Pacific/Auckland", open: "11:00", close: "19:00" },
+            { name: "Haltech Australia", timeZone: "Australia/Sydney", open: "09:00", close: "17:00" },
+            { name: "Haltech EU", timeZone: "Europe/Vienna", open: "08:00", close: "17:00" }
+        ];
+
+        function updateStatus() {
+            const results = document.getElementById("results");
+            results.innerHTML = "";
+
+            locations.forEach(location => {
+                const { isOpen, currentMinutes, openMinutes, closeMinutes } = isOpenNow(location.open, location.close, location.timeZone);
+                const statusText = isOpen ? "Open" : "Closed";
+                const statusColor = isOpen ? "green" : "red";
+                let nextEvent = "";
+
+                if (isOpen) {
+                    const minutesToClose = closeMinutes - currentMinutes;
+                    const hours = Math.floor(minutesToClose / 60);
+                    const minutes = minutesToClose % 60;
+                    nextEvent = minutesToClose <= 30 ? `Closing in ${minutesToClose} minutes` : `Open for ${hours}h ${minutes}m`;
+                } else {
+                    const minutesToOpen = openMinutes - currentMinutes;
+                    const hours = Math.floor(minutesToOpen / 60);
+                    const minutes = minutesToOpen % 60;
+                    nextEvent = minutesToOpen > 0 ? `Opens in ${hours}h ${minutes}m` : "Closed";
+                }
+
+                const row = document.createElement("tr");
+                row.innerHTML = `
+                    <td><strong>${location.name}</strong></td>
+                    <td style='color:${statusColor}'>${statusText}</td>
+                    <td>${nextEvent}</td>
+                `;
+                results.appendChild(row);
+            });
+        }
+
+        document.addEventListener("DOMContentLoaded", updateStatus);
+    </script>
+</body>
+</html>
