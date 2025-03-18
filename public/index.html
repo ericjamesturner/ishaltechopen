@@ -38,12 +38,12 @@
         }
 
         const locations = [
-            { name: "Haltech USA EAST", timeZone: "America/New_York", open: "08:00", close: "17:00", phone: "(888) 298 8116" },
-            { name: "Haltech USA WEST", timeZone: "America/Los_Angeles", open: "08:00", close: "17:00", phone: "(888) 298 8116" },
-            { name: "Haltech UK", timeZone: "Europe/London", open: "08:00", close: "17:00", phone: "+44 121 285 6650" },
-            { name: "Haltech NZ", timeZone: "Pacific/Auckland", open: "11:00", close: "19:00", phone: "+64 988 706 16" },
-            { name: "Haltech Australia", timeZone: "Australia/Sydney", open: "09:00", close: "17:00", phone: "+61 2 9729 0999" },
-            { name: "Haltech EU", timeZone: "Europe/Vienna", open: "08:00", close: "17:00", phone: "+43 720 883968" }
+            { name: "Haltech USA EAST", timeZone: "America/New_York", open: "08:00", close: "17:00", phones: [{ description: "Main", number: "(888) 298 8116" }] },
+            { name: "Haltech USA WEST", timeZone: "America/Los_Angeles", open: "08:00", close: "17:00", phones: [{ description: "Main", number: "(888) 298 8116" }] },
+            { name: "Haltech UK", timeZone: "Europe/London", open: "08:00", close: "17:00", phones: [{ description: "Main", number: "+44 121 285 6650" }] },
+            { name: "Haltech NZ", timeZone: "Pacific/Auckland", open: "11:00", close: "19:00", phones: [{ description: "Main", number: "+64 988 706 16" }] },
+            { name: "Haltech Australia", timeZone: "Australia/Sydney", open: "09:00", close: "17:00", phones: [{ description: "Main", number: "+61 2 9729 0999" }, { description: "Call from USA", number: "(888) 298 8116" }] },
+            { name: "Haltech EU", timeZone: "Europe/Vienna", open: "08:00", close: "17:00", phones: [{ description: "Main", number: "+43 720 883968" }] }
         ];
 
         function updateStatus() {
@@ -66,6 +66,7 @@
                 const { isOpen, currentMinutes, openMinutes, closeMinutes } = location;
                 const statusText = isOpen ? "Open" : "Closed";
                 const statusColor = isOpen ? "text-green-400" : "text-red-400";
+                const cardBgColor = isOpen ? "bg-green-800" : "bg-gray-800";
                 let nextEvent = "";
 
                 if (isOpen) {
@@ -93,12 +94,13 @@
                 }
 
                 const card = document.createElement("div");
-                card.className = "bg-gray-800 shadow-md rounded-lg p-4 border border-gray-700";
+                card.className = `${cardBgColor} shadow-md rounded-lg p-4 border border-gray-700`;
                 card.innerHTML = `
                     <h2 class="text-xl font-bold mb-2">${location.name}</h2>
                     <p class="${statusColor} mb-2">${statusText}</p>
+                    <p class="mb-2">Open: ${location.open} - Close: ${location.close}</p>
                     <p class="mb-2">${nextEvent}</p>
-                    <p><a href="tel:${location.phone}" class="text-blue-400">${location.phone}</a></p>
+                    ${location.phones.map(phone => `<p><a href="tel:${phone.number}" class="text-blue-400">${phone.description}: ${phone.number}</a></p>`).join('')}
                 `;
                 results.appendChild(card);
             });
