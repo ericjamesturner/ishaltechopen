@@ -76,7 +76,7 @@
                     if (minutesToClose === 0) {
                         nextEvent = "Closing Now";
                     } else {
-                        nextEvent = minutesToClose <= 30 ? `Closing in ${minutesToClose} minutes` : `Open for ${hours > 0 ? `${hours}h` : ''}${minutes > 0 ? ` ${minutes}m` : ''}`;
+                        nextEvent = minutesToClose <= 30 ? `Closing in ${minutesToClose} minutes` : `Open for ${hours > 0 ? `${hours}h` : ''}${minutes > 0 ? ` ${minutes}m` : ''} more`;
                     }
                 } else {
                     const minutesSinceClose = currentMinutes - closeMinutes;
